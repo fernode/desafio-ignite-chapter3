@@ -37,7 +37,6 @@ export default function Post({ post }: PostProps) {
     const min = Math.ceil(total.length / 200);
     return acc + min;
   }, 0);
-  console.log({ post });
   if (router.isFallback) {
     return <>Carregando...</>;
   }
