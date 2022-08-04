@@ -1,9 +1,10 @@
 import { GetStaticProps } from 'next';
+import { ReactElement, useState } from 'react';
+import commonStyles from 'styles/common.module.scss';
+import Header from '../components/Header';
 
+import PostCard from '../components/PostCard';
 import { getPrismicClient } from '../services/prismic';
-
-import commonStyles from '../styles/common.module.scss';
-import styles from './home.module.scss';
 
 interface Post {
   uid?: string;
@@ -24,13 +25,56 @@ interface HomeProps {
   postsPagination: PostPagination;
 }
 
-// export default function Home() {
-//   // TODO
-// }
+export default function Home({ postsPagination }: HomeProps): ReactElement {
+  const [posts, setPosts] = useState(postsPagination.results);
+  const [nextPage, setNextPage] = useState(postsPagination.next_page);
 
-// export const getStaticProps = async () => {
-//   // const prismic = getPrismicClient({});
-//   // const postsResponse = await prismic.getByType(TODO);
+  function handleMorePosts(): void {
+    fetch(postsPagination.next_page)
+      .then(res => res.json())
+      .then(jsonData => {
+        const newPosts = jsonData.results.map(post => {
+          return {
+            uid: post.uid,
+            first_publication_date: post.first_publication_date,
+            data: post.data,
+          };
+        });
+        setPosts(oldPosts => [...oldPosts, ...newPosts]);
+        setNextPage(jsonData.next_page);
+      });
+  }
+  return (
+    <>
+      <Header />
 
-//   // TODO
-// };
+      <div className={commonStyles.container}>
+        {posts.map(post => (
+          <PostCard
+            key={post.uid}
+            data={post.data}
+            uid={post.uid}
+            first_publication_date={post.first_publication_date}
+          />
+        ))}
+      </div>
+
+      {nextPage && (
+        <div className={commonStyles.container}>
+          <button type="button" onClick={handleMorePosts}>
+            Carregar mais posts
+          </button>
+        </div>
+      )}
+    </>
+  );
+}
+
+export const getStaticProps: GetStaticProps = async () => {
+  const client = getPrismicClient({});
+  const postsPagination = await client.getByType('posts');
+
+  return {
+    props: { postsPagination }, // Will be passed to the page component as props
+  };
+};

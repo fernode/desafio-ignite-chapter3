@@ -3,5 +3,30 @@
   margin: 0;
   padding: 0;
 }
+html {
+  font-size: 62.5%;
+}
+html, body, #__next {
+  height: 100%;
+}
 
-// TODO
+body {
+  background: var(--background);
+  font-family: 'Inter';
+  font-size: 1.6rem;
+}
+
+.container {
+  margin: 0 auto;
+  padding: 0 20px;
+  width: 960px;
+}
+
+:root {
+  --background: #1A1D23;
+  --body: #D7D7D7;
+  --heading: #F8F8F8;
+  --highlight:#FF57B2;
+  --info: #BBBBBB;
+}
+
